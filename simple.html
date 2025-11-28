@@ -1,0 +1,168 @@
+
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Work Log</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<style>
+    body {
+        margin:0;
+        padding:20px;
+        background:#0d0d0d;
+        color:#00ff95;
+        font-family: "JetBrains Mono", monospace;
+        overflow-y:scroll;
+    }
+
+    body:before {
+        content:"";
+        position:fixed;
+        top:0; left:0; right:0; bottom:0;
+        pointer-events:none;
+        background:linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+        background-size:100% 3px;
+    }
+
+    h1 {
+        margin:0 0 12px 0;
+        color:#00ffc3;
+        font-size:22px;
+    }
+
+    #log {
+        display:flex;
+        flex-direction:column;
+        gap:16px;
+    }
+
+    .entry {
+        background:rgba(0,0,0,0.45);
+        border-left:4px solid #00ff95;
+        padding:14px 16px;
+        border-radius:4px;
+        white-space:pre-wrap;
+        color:#00ff95;
+        position:relative;
+        min-height:40px;
+    }
+
+    /* blinking cursor */
+    .cursor {
+        display:inline-block;
+        width:10px;
+        background:#00ff95;
+        animation: blink 0.9s step-start infinite;
+        margin-left:2px;
+    }
+    @keyframes blink {
+        50% { opacity:0; }
+    }
+
+    .ts {
+        color:#77ffcc;
+        font-size:13px;
+        margin-bottom:6px;
+    }
+
+    .tags {
+        margin-top:6px;
+        color:#00d78a;
+        font-size:13px;
+    }
+</style>
+</head>
+<body>
+
+<h1>Ibrahim's Work Log – Live Console</h1>
+<h3>HAL9000: I'm sorry, Dave. I'm afraid I can't do that.</h3>
+<div id="log"></div>
+
+<script>
+async function typewriter(el, text, speed = 25) {
+    el.textContent = "";
+    for (let i = 0; i < text.length; i++) {
+        el.textContent += text[i];
+        await new Promise(r => setTimeout(r, speed));
+    }
+}
+
+function createEntrySkeleton(u) {
+    const wrap = document.createElement("div");
+    wrap.className = "entry";
+
+    const ts = document.createElement("div");
+    ts.className = "ts";
+    ts.textContent = new Date(u.timestamp).toLocaleString();
+    wrap.appendChild(ts);
+
+    const msg = document.createElement("div");
+    msg.className = "msg";
+    wrap.appendChild(msg);
+
+    if (u.tags && u.tags.length) {
+        const t = document.createElement("div");
+        t.className = "tags";
+        t.textContent = "tags: " + u.tags.join(", ");
+        wrap.appendChild(t);
+    }
+
+    return wrap;
+}
+
+async function animateNewEntry(u) {
+    const container = document.getElementById("log");
+    const entry = createEntrySkeleton(u);
+
+    const msgEl = entry.querySelector(".msg");
+
+    // Add cursor
+    const cursor = document.createElement("span");
+    cursor.className = "cursor";
+    msgEl.appendChild(cursor);
+
+    container.prepend(entry);
+
+    // typewriter effect
+    const fullText = u.message;
+    msgEl.removeChild(cursor);
+    await typewriter(msgEl, fullText, 18);
+
+    // Add cursor back at the end
+    msgEl.appendChild(cursor);
+
+    // After 1.5s remove cursor permanently
+    setTimeout(() => cursor.remove(), 1500);
+}
+
+async function loadInitial() {
+    const res = await fetch("/initial");
+    const list = await res.json();
+    const container = document.getElementById("log");
+
+    for (let i = list.length - 1; i >= 0; i--) {
+        const e = createEntrySkeleton(list[i]);
+        e.querySelector(".msg").textContent = list[i].message;
+        container.append(e);
+    }
+}
+
+function startStream() {
+    const es = new EventSource("/stream");
+    es.onmessage = async e => {
+        try {
+            const u = JSON.parse(e.data);
+            await animateNewEntry(u);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+}
+
+loadInitial();
+startStream();
+</script>
+
+</body>
+</html>
+
