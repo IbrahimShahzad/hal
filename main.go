@@ -38,6 +38,7 @@ func main() {
 	mux.HandleFunc("/initial", s.handleInitial)
 	mux.HandleFunc("/stream", s.handleStream)
 	mux.HandleFunc("/update", s.handlePost)
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	mux.HandleFunc("/", s.handleIndex)
 
 	srv := &http.Server{

@@ -75,7 +75,7 @@ func (s *Server) insertUpdate(u *Update) error {
 }
 
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./simple.html")
+	http.ServeFile(w, r, "./index.html")
 }
 
 func (s *Server) handleStream(w http.ResponseWriter, r *http.Request) {
