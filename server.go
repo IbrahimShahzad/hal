@@ -101,7 +101,7 @@ func (s *Server) handleStream(w http.ResponseWriter, r *http.Request) {
 			return
 		case u := <-clientCh:
 			b, _ := json.Marshal(u)
-			fmt.Fprintf(w, "data: %s\n\n", b)
+			fmt.Fprintf(w, "data: %s\n\n", b) // nolint:errcheck
 			flusher.Flush()
 		}
 	}
@@ -114,7 +114,7 @@ func (s *Server) handleInitial(w http.ResponseWriter, r *http.Request) {
 	// NOTE: we display in descending order on frontend, so we need to keep the
 	// order opposite here so select query orders by ts ASC
 	rows := Must(s.db.Query(SelectTodayEntriesQuery))
-	defer rows.Close()
+	defer rows.Close() // nolint:errcheck
 
 	list := []Update{}
 
@@ -125,7 +125,7 @@ func (s *Server) handleInitial(w http.ResponseWriter, r *http.Request) {
 			tags string
 			ts   string
 		)
-		rows.Scan(&id, &msg, &tags, &ts)
+		rows.Scan(&id, &msg, &tags, &ts) // nolint:errcheck
 		list = append(list, Update{
 			ID:      id,
 			Message: msg,
@@ -140,7 +140,7 @@ func (s *Server) handleInitial(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(list)
+	json.NewEncoder(w).Encode(list) // nolint:errcheck
 }
 
 func (s *Server) handlePost(w http.ResponseWriter, r *http.Request) {
@@ -183,5 +183,5 @@ func (s *Server) handlePost(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(u)
+	json.NewEncoder(w).Encode(u) // nolint:errcheck
 }

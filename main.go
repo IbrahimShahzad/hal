@@ -28,6 +28,14 @@ func main() {
 	token := flag.String("token", "", "auth token")
 	flag.Parse()
 
+	if *token == "" {
+		tokenEnv := os.Getenv("AUTH_TOKEN")
+		if tokenEnv == "" {
+			log.Fatal("auth token must be provided via -token flag or AUTH_TOKEN environment variable")
+		}
+		*token = tokenEnv
+	}
+
 	db := Must(sql.Open("sqlite3", "./worklog.db"))
 
 	Must(db.Exec(CreateTableQuery))
@@ -50,7 +58,7 @@ func main() {
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, os.Interrupt)
 		<-c
-		srv.Shutdown(context.Background())
+		srv.Shutdown(context.Background()) // nolint:errcheck
 	}()
 
 	log.Println("Listening on", *addr)

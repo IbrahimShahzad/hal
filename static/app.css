@@ -3,7 +3,8 @@ body {
 	padding:20px;
 	background:#0d0d0d;
 	color:#00ff95;
-	font-family: "JetBrains Mono", monospace;
+	font-family: "Fira Code", "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "Source Code Pro", "Menlo", "Courier New", monospace;
+	font-weight: 400;
 	overflow-y:scroll;
 }
 
@@ -52,13 +53,13 @@ h1 {
 }
 
 .ts {
-	color:#77ffcc;
+	color:#ffcf77;
 	font-size:13px;
 	margin-bottom:6px;
 }
 
 .tags {
 	margin-top:6px;
-	color:#00d78a;
+	color:#009c72;
 	font-size:13px;
 }

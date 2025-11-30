@@ -1,21 +1,16 @@
-# Client
+# Client 
 
+Client to talk to hal
 
-In order to send messages to the server, run the following
+## Usage
 
-```bash
-cd tools/client
-go build . -o hal-client
-./hal-cient --help
-./hal-cleint -addr localhost:8080 -token myuperduperstrongandmightypassword -m "Hello, HAL!" -t tag1,tag2
+```zsh
+go build -o status_update main.go
+POST_URL=https://localhost:8000/update AUTH_TOKEN=your-secret-token ./status_update
 ```
 
-If the token is not provided, the client will look for the `X-Auth-Token` environment variable.
+And then submit your messages...
 
-In order to run from any location
+![alt text](images/client.png)
 
-```bash
-mv hal-client /usr/local/bin/hal-client
-```
 
-> Note: Will try to upgrade the client to be a TUI...
