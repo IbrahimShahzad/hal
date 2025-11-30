@@ -21,6 +21,8 @@ go build . -o hal
 ./hal -addr "localhost:8000" -token "mysuperduperstrongandmightypassword"
 ```
 
+and just use your favourite browser to get to the main page "http://localhost:8000/"
+
 ## Client
 
 For sending messages to HAL from command line, see the [client documentation](tools/client/README.md).
