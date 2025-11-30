@@ -31,4 +31,5 @@ go.work.sum
 # .idea/
 # .vscode/
 hal
+h_comms
 worklog.db

@@ -25,28 +25,25 @@ func Must[T any](v T, err error) T {
 
 func main() {
 	addr := flag.String("addr", ":8080", "listen address")
-	token := flag.String("token", "", "auth token")
 	flag.Parse()
-
-	if *token == "" {
-		tokenEnv := os.Getenv("AUTH_TOKEN")
-		if tokenEnv == "" {
-			log.Fatal("auth token must be provided via -token flag or AUTH_TOKEN environment variable")
-		}
-		*token = tokenEnv
-	}
 
 	db := Must(sql.Open("sqlite3", "./worklog.db"))
 
+	Must(db.Exec(CreateUsersTableQuery))
 	Must(db.Exec(CreateTableQuery))
 
-	s := NewServer(db, *token)
+	s := NewServer(db)
 
 	mux := http.NewServeMux()
+
+	mux.HandleFunc("POST /users", s.handleCreateUser)
+
+	mux.HandleFunc("/initial/", s.handleInitial)
 	mux.HandleFunc("/initial", s.handleInitial)
 	mux.HandleFunc("/stream", s.handleStream)
 	mux.HandleFunc("/update", s.handlePost)
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	mux.HandleFunc("GET /user/{username}", s.handleUserIndex)
 	mux.HandleFunc("/", s.handleIndex)
 
 	srv := &http.Server{
@@ -62,5 +59,7 @@ func main() {
 	}()
 
 	log.Println("Listening on", *addr)
+	log.Println("Create users with: POST /users {\"username\": \"alex\"}")
+	log.Println("View user logs at: /user/{username}")
 	log.Fatal(srv.ListenAndServe())
 }

@@ -1,16 +1,32 @@
 # Client 
 
-Client to talk to hal
+Comms client for crew members. 
 
 ## Usage
 
+### Build the client
+
 ```zsh
-go build -o status_update main.go
-POST_URL=https://localhost:8000/update AUTH_TOKEN=your-secret-token ./status_update
+go build
 ```
 
-And then submit your messages...
+### Run the client
 
-![alt text](images/client.png)
+```zsh
+# Run with default settings (localhost:8080)
+./h_comms
+
+# Run with custom server address
+./h_comms -addr localhost:8000
+```
+
+## How it works
+
+Just run, it's simple enough that you will get the hang of it.
+
+> Tokens are saved in `~/.hal/tokens/<USERNAME>.token`.
+
+
+![Client Interface](images/client.png)
 
 

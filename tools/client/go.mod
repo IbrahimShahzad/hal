@@ -1,4 +1,4 @@
-module http-post
+module h_comms
 
 go 1.25.3
 

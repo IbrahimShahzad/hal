@@ -1,3 +1,13 @@
+// Get current user from URL path
+function getCurrentUser() {
+    const path = window.location.pathname;
+    if (path === '/') return null;
+    if (path.startsWith('/user/')) {
+        return path.substring(6); // Remove "/user/" prefix
+    }
+    return null;
+}
+
 async function typewriter(el, text, speed = 25) {
     el.textContent = "";
     for (let i = 0; i < text.length; i++) {
@@ -14,6 +24,10 @@ function createEntrySkeleton(u) {
     ts.className = "ts";
     wrap.appendChild(ts);
 
+    const user = document.createElement("div");
+    user.className = "username";
+    wrap.appendChild(user);
+
     const msg = document.createElement("div");
     msg.className = "msg";
     wrap.appendChild(msg);
@@ -28,10 +42,17 @@ function createEntrySkeleton(u) {
 }
 
 async function animateNewEntry(u) {
+    const currentUser = getCurrentUser();
+    
+    if (currentUser && u.username !== currentUser) {
+        return;
+    }
+    
     const container = document.getElementById("log");
     const entry = createEntrySkeleton(u);
 
     const tsEl = entry.querySelector(".ts");
+    const userEl = entry.querySelector(".username");
     const msgEl = entry.querySelector(".msg");
     const tagsEl = entry.querySelector(".tags");
 
@@ -39,6 +60,13 @@ async function animateNewEntry(u) {
 
     const timestampText = new Date(u.timestamp).toLocaleString();
     await typewriter(tsEl, timestampText, 35);
+
+    if (userEl && u.username && !currentUser) {
+        const usernameText = `[${u.username}]`;
+        await typewriter(userEl, usernameText, 25);
+    } else if (userEl) {
+        userEl.remove();
+    }
 
     const cursor = document.createElement("span");
     cursor.className = "cursor";
@@ -58,21 +86,32 @@ async function animateNewEntry(u) {
 }
 
 async function loadInitial() {
-    const res = await fetch("/initial");
+    const currentUser = getCurrentUser();
+    const endpoint = currentUser ? `/initial/${currentUser}` : '/initial';
+    
+    console.log('Current user:', currentUser);
+    console.log('Fetching from:', endpoint);
+    
+    const res = await fetch(endpoint);
     const list = await res.json();
+    
+    console.log('Received data:', list);
+    
     const container = document.getElementById("log");
 
     for (let i = list.length - 1; i >= 0; i--) {
         const e = createEntrySkeleton(list[i]);
         
-        // Set timestamp
         const tsEl = e.querySelector(".ts");
         tsEl.textContent = new Date(list[i].timestamp).toLocaleString();
         
-        // Set message
+        const userEl = e.querySelector(".username");
+        if (userEl && list[i].username && !currentUser) {
+            userEl.textContent = `[${list[i].username}]`;
+        } else if (userEl) {
+            userEl.remove();
+        }
         e.querySelector(".msg").textContent = list[i].message;
-        
-        // Set tags if they exist
         const tagsEl = e.querySelector(".tags");
         if (tagsEl && list[i].tags && list[i].tags.length) {
             tagsEl.textContent = "tags: " + list[i].tags.join(", ");
@@ -94,5 +133,19 @@ function startStream() {
     };
 }
 
+// Update page title and header based on current user
+function updatePageTitle() {
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+        document.title = `HAL Activity Monitor - ${currentUser}`;
+        const header = document.querySelector('h2');
+        if (header) {
+            header.textContent = `[ HAL ] Monitoring Protocol: ${currentUser.toUpperCase()}`;
+        }
+    }
+}
+
+// Initialize page
+updatePageTitle();
 loadInitial();
 startStream();
