@@ -4,24 +4,20 @@
         <meta charset="utf-8"/>
         <title>Work Log</title>
         <meta name="viewport" content="width=device-width,initial-scale=1"/>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="static/crt.css"/>
+        <link rel="stylesheet" href="static/boot.css"/>
         <link rel="stylesheet" href="static/app.css"/>
     </head>
     <body>
         <div id="crt-startup"></div>
         <div id="app" style="display:none;">
-            <h1>Work Log - Live Console</h1>
-            <h3>HAL: I'm sorry, Dave. I'm afraid I can't do that.</h3>
+            <h2>[ HAL ] Crew Monitoring Protocol Active</h2>
             <div id="log"></div>
         </div>
+        <script src="static/boot.js"></script>
         <script src="static/app.js"></script>
-        <script>
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('crt-startup').remove();
-                document.getElementById('app').style.display = 'block';
-            }, 1200); 
-        });
-        </script>
     </body>
 </html>

@@ -1,0 +1,73 @@
+#boot-screen {
+	position: fixed;
+	top: 0; left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: #0d0d0d;
+	color: #00ff95;
+	font-family: "Fira Code", "Roboto Mono", "Courier New", monospace;
+	font-size: 14px;
+	font-weight: 400;
+	z-index: 10000;
+	padding: 20px;
+	box-sizing: border-box;
+	overflow: hidden;
+}
+
+#boot-content {
+	white-space: pre-wrap;
+	line-height: 1.4;
+}
+
+.boot-line {
+	margin-bottom: 2px;
+}
+
+.boot-prompt {
+	color: #00ffc3;
+}
+
+.boot-success {
+	color: #00ff95;
+}
+
+.boot-warning {
+	color: #ffaa00;
+}
+
+.boot-error {
+	color: #ff5555;
+}
+
+.boot-info {
+	color: #77ffcc;
+}
+
+.boot-cursor {
+	background: #00ff95;
+	animation: bootBlink 1s step-start infinite;
+}
+
+.boot-userinput {
+	color: #ffd900;
+}
+
+.boot-hal-response {
+    color: #ffaa00;
+}
+
+@keyframes bootBlink {
+	50% { opacity: 0; }
+}
+
+.boot-complete {
+	animation: bootFadeOut 0.5s ease-out forwards;
+	animation-delay: 0.5s;
+}
+
+@keyframes bootFadeOut {
+	to { 
+		opacity: 0; 
+		visibility: hidden;
+	}
+}

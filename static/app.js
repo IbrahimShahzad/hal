@@ -12,7 +12,6 @@ function createEntrySkeleton(u) {
 
     const ts = document.createElement("div");
     ts.className = "ts";
-    ts.textContent = new Date(u.timestamp).toLocaleString();
     wrap.appendChild(ts);
 
     const msg = document.createElement("div");
@@ -22,7 +21,6 @@ function createEntrySkeleton(u) {
     if (u.tags && u.tags.length) {
         const t = document.createElement("div");
         t.className = "tags";
-        t.textContent = "tags: " + u.tags.join(", ");
         wrap.appendChild(t);
     }
 
@@ -33,24 +31,29 @@ async function animateNewEntry(u) {
     const container = document.getElementById("log");
     const entry = createEntrySkeleton(u);
 
+    const tsEl = entry.querySelector(".ts");
     const msgEl = entry.querySelector(".msg");
+    const tagsEl = entry.querySelector(".tags");
 
-    // Add cursor
+    container.prepend(entry);
+
+    const timestampText = new Date(u.timestamp).toLocaleString();
+    await typewriter(tsEl, timestampText, 35);
+
     const cursor = document.createElement("span");
     cursor.className = "cursor";
     msgEl.appendChild(cursor);
 
-    container.prepend(entry);
-
-    // typewriter effect
     const fullText = u.message;
     msgEl.removeChild(cursor);
-    await typewriter(msgEl, fullText, 18);
+    await typewriter(msgEl, fullText, 75);
 
-    // Add cursor back at the end
     msgEl.appendChild(cursor);
 
-    // After 1.5s remove cursor permanently
+    if (tagsEl && u.tags && u.tags.length) {
+        const tagsText = "tags: " + u.tags.join(", ");
+        await typewriter(tagsEl, tagsText, 35);
+    }
     setTimeout(() => cursor.remove(), 1500);
 }
 
@@ -61,7 +64,20 @@ async function loadInitial() {
 
     for (let i = list.length - 1; i >= 0; i--) {
         const e = createEntrySkeleton(list[i]);
+        
+        // Set timestamp
+        const tsEl = e.querySelector(".ts");
+        tsEl.textContent = new Date(list[i].timestamp).toLocaleString();
+        
+        // Set message
         e.querySelector(".msg").textContent = list[i].message;
+        
+        // Set tags if they exist
+        const tagsEl = e.querySelector(".tags");
+        if (tagsEl && list[i].tags && list[i].tags.length) {
+            tagsEl.textContent = "tags: " + list[i].tags.join(", ");
+        }
+        
         container.append(e);
     }
 }
