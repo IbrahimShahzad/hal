@@ -36,13 +36,15 @@ func main() {
 
 	mux := http.NewServeMux()
 
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	mux.Handle("/audio/", http.StripPrefix("/audio/", http.FileServer(http.Dir("audio"))))
+
 	mux.HandleFunc("POST /users", s.handleCreateUser)
 
 	mux.HandleFunc("/initial/", s.handleInitial)
 	mux.HandleFunc("/initial", s.handleInitial)
 	mux.HandleFunc("/stream", s.handleStream)
 	mux.HandleFunc("/update", s.handlePost)
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	mux.HandleFunc("GET /user/{username}", s.handleUserIndex)
 	mux.HandleFunc("/", s.handleIndex)
 

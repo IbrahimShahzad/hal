@@ -1,5 +1,6 @@
 class BootSequence {
     constructor() {
+        this.modemAudio = null;
         this.bootLines = [
             { text: "HAL 9000 (Heuristically Programmed Algorithmic Computer)", class: "boot-prompt", delay: 100 },
             { text: "build: 1968, deploy-message: '2001: A Space Odyssey'", class: "boot-prompt", delay: 100 },
@@ -81,6 +82,7 @@ class BootSequence {
     }
 
     skipBoot(bootScreen) {
+        this.stopModemAudio();
         this.container.innerHTML = '';
         
         const skipLine = document.createElement('div');
@@ -92,6 +94,22 @@ class BootSequence {
             bootScreen.remove();
             document.getElementById('app').style.display = 'block';
         }, 800);
+    }
+
+    startModemAudio() {
+        this.modemAudio = new Audio('/audio/dial-up-modem-01.mp3');
+        this.modemAudio.volume = 0.8;
+        this.modemAudio.play().catch(err => {
+            console.log('Audio playback failed:', err);
+        });
+    }
+
+    stopModemAudio() {
+        if (this.modemAudio) {
+            this.modemAudio.pause();
+            this.modemAudio.currentTime = 0;
+            this.modemAudio = null;
+        }
     }
 
     async typewriter(element, text, speed = 30) {
@@ -135,6 +153,7 @@ class BootSequence {
         document.body.appendChild(bootScreen);
 
         this.setupSkipListeners(bootScreen);
+        this.startModemAudio();
 
         for (const line of this.bootLines) {
             if (this.skipped) break;
@@ -147,6 +166,7 @@ class BootSequence {
         }
 
         if (!this.skipped) {
+            this.stopModemAudio();
             const cursor = document.createElement('span');
             cursor.textContent = '_';
             cursor.className = 'boot-cursor';
